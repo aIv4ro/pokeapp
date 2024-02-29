@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pokeapp/data.dart';
+import 'package:pokeapp/i18n.dart';
 import 'package:pokeapp/pokedex.dart';
 
 class Pokemon {
@@ -58,7 +59,7 @@ class _PokemonPageState extends State<PokemonPage> {
             future: _pokemon, 
             builder:(context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return const CircularProgressIndicator();
+                return const Center(child: CircularProgressIndicator());
               }
               if (snapshot.hasError) {
                 return Text('Error: ${snapshot.error}');
@@ -79,6 +80,8 @@ class _PokemonPageState extends State<PokemonPage> {
                         child: Image.network(
                           pokemon.image,
                           width: MediaQuery.of(context).size.width * .5,
+                          height: MediaQuery.of(context).size.width * .5,
+                          fit: BoxFit.cover,
                         ),
                       ),
                       Text('N.º $id', textAlign: TextAlign.left,),
@@ -100,7 +103,7 @@ class _PokemonPageState extends State<PokemonPage> {
                                   color: Color(typeColors['color']!),
                                 ),
                                 padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-                                child: Text(type.capitalize(), style: TextStyle(color: Color(typeColors['textColor']!)))
+                                child: Text(t(type), style: TextStyle(color: Color(typeColors['textColor']!)))
                               );
                             }
                           ).toList(),

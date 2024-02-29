@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pokeapp/data.dart';
-import 'package:pokeapp/pokemon.dart';
+import 'package:pokeapp/i18n.dart';
 
 class TypesTablePage extends StatefulWidget {
   const TypesTablePage({super.key, required this.searchText, this.selectedTypes });
@@ -36,7 +36,7 @@ class _TypesTablePageState extends State<TypesTablePage> {
                 return Padding(
                   padding: const EdgeInsets.all(0),
                   child: InputChip(
-                    label: Text(type.capitalize()),
+                    label: Text(t(type)),
                     padding: EdgeInsets.zero,
                     labelStyle: TextStyle(color: Color(typeColors['textColor']!)),
                     backgroundColor: Color(typeColors['color']!),
@@ -51,7 +51,7 @@ class _TypesTablePageState extends State<TypesTablePage> {
             ),
           
           DataTable(
-            columnSpacing: 20,
+            columnSpacing: 15,
             dataRowMaxHeight: double.infinity,
             columns: const <DataColumn>[
               DataColumn(
@@ -88,10 +88,10 @@ class _TypesTablePageState extends State<TypesTablePage> {
                 }).map((type) {
                   return DataRow(
                     cells: [
-                      DataCell(Text(type.name)),
-                      DataCell(Text(type.strengths.join(', '))),
-                      DataCell(Text(type.weaknesses.join(', '))),
-                      DataCell(Text(type.debilities.join(', '))),
+                      DataCell(Text(t(type.name))),
+                      DataCell(Text(type.strengths.map((e) => t(e)).join(', '))),
+                      DataCell(Text(type.weaknesses.map((e) => t(e)).join(', '))),
+                      DataCell(Text(type.debilities.map((e) => t(e)).join(', '))),
                     ],
                   );
                 })
