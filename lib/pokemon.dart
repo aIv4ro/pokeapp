@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:pokeapp/data.dart';
 import 'package:pokeapp/pokedex.dart';
 
@@ -84,28 +83,28 @@ class _PokemonPageState extends State<PokemonPage> {
                       ),
                       Text('N.º $id', textAlign: TextAlign.left,),
                       Text(pokemon.name.capitalize(), style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                      Wrap(
-                        spacing: 10,
-                        children: pokemon.types.map(
-                          (type) {
-                            final typeColors = typeColorMap[type]!;
-                            return InkWell(
-                              onTap: () {
-                                Navigator.pushNamed(context, '/', arguments: {
-                                  'type': type,
-                                });
-                              },
-                              child: Container(
+                      InkWell(
+                        onTap: () {
+                          Navigator.pushNamed(context, '/', arguments: {
+                            'types': pokemon.types.map((e) => e.toLowerCase()).toList(),
+                          });
+                        },
+                        child: Wrap(
+                          spacing: 10,
+                          children: pokemon.types.map(
+                            (type) {
+                              final typeColors = typeColorMap[type]!;
+                              return Container(
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(2),
                                   color: Color(typeColors['color']!),
                                 ),
                                 padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
                                 child: Text(type.capitalize(), style: TextStyle(color: Color(typeColors['textColor']!)))
-                              ),
-                            );
-                          }
-                        ).toList(),
+                              );
+                            }
+                          ).toList(),
+                        ),
                       )
                     ],
                   )

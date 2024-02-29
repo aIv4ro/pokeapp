@@ -23,8 +23,8 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (context) {
           final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>?;
-          final initialTypeSearch = args?['type'] as String?;
-          return MyHomePage(title: 'Pokeapp', initialTypeSearch: initialTypeSearch);
+          final types = args?['types'] as List<String>?;
+          return MyHomePage(title: 'Pokeapp', types: types);
         },
         '/pokemon': (context) {
           final url = ModalRoute.of(context)!.settings.arguments as String;
@@ -36,10 +36,10 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title, this.initialTypeSearch});
+  const MyHomePage({super.key, required this.title, this.types});
 
   final String title;
-  final String? initialTypeSearch;
+  final List<String>? types;
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -47,28 +47,20 @@ class MyHomePage extends StatefulWidget {
 
 class PageInfo {
   final String description;
-  StatefulWidget Function(String) widget;
 
-  PageInfo({required this.description, required this.widget});
+  PageInfo({required this.description});
 
 }
 
 class _MyHomePageState extends State<MyHomePage> {
   static final pagesInfo = [
     PageInfo(
-      description: 'Tipos',
-      widget: (String searchText) {
-        return TypesTablePage(searchText: searchText);
-      },
+      description: 'Tipos'
     ), 
     PageInfo(
-      description: 'Pokedex',
-      widget: (String searchText) {
-        return const PokedexPage();
-      },
+      description: 'Pokedex'
     ),
   ];
-  final searchbarController = TextEditingController();
   int _pageIndex = 0;
   bool _searching = false;
   String _searchText = '';
@@ -76,11 +68,6 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-    if (widget.initialTypeSearch != null) {
-      _searching = true;
-      _searchText = widget.initialTypeSearch!;
-      searchbarController.value = TextEditingValue(text: widget.initialTypeSearch!);
-    }
   }
 
   @override
@@ -90,7 +77,6 @@ class _MyHomePageState extends State<MyHomePage> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: _searching 
           ? SearchBar(
-            controller: searchbarController,
             onChanged: (value) => setState(() {
               _searchText = value;
             }),
@@ -125,7 +111,10 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ],
       ),
-      body: pagesInfo[_pageIndex].widget(_searchText),
+      body: [
+        TypesTablePage(searchText: _searchText, selectedTypes: widget.types),
+        const PokedexPage()
+      ][_pageIndex],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _pageIndex,
         onTap: (value) {
