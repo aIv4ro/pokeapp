@@ -8,18 +8,34 @@ class Pokemon {
   final String name;
   final String image;
   final List<String> types;
-  final List<Pokemon> evs;
+  final List<Evolution> evs;
 
   Pokemon({required this.id, required this.name, required this.image, required this.types, this.evs = const []});
 
-  static fromJson (Map<String, dynamic> json, {List<Pokemon> evs = const []}) {
+  static fromJson (Map<String, dynamic> json, {List<Evolution> evs = const []}) {
     final id = json['id'] as int;
     final name = json['name'] as String;
     final image = json['sprites']['other']['official-artwork']['front_default'] as String;
     final types = (json['types'] as List<dynamic>).map((e) => e['type']['name'] as String).toList();
     return Pokemon(id: id, name: name, image: image, types: types, evs: evs);
   }
+}
 
+class Evolution {
+  final String name;
+  final String image;
+  final int? level;
+
+  Evolution({required this.name, required this.image, this.level});
+
+  static fromJson ({
+    required Map<String, dynamic> json,
+    int? level
+  }) {
+    final name = json['name'] as String;
+    final image = json['sprites']['other']['official-artwork']['front_default'] as String;
+    return Evolution(name: name, image: image, level: level);
+  }
 }
 
 class PokemonPage extends StatefulWidget {
@@ -50,27 +66,41 @@ class _PokemonPageState extends State<PokemonPage> {
           ).then((value) {
             final json = value.data as Map<String, dynamic>;
             final chain = json['chain'] as Map<String, dynamic>;
-            final List<String> evs = [];
-            evs.add(chain['species']['name']);
+            final List evs = [];
+            evs.add({
+              'name': chain['species']['name'],
+              'level': null
+            });
             final firstEv = chain['evolves_to'] as List<dynamic>;
             if (firstEv.isNotEmpty) {
-              evs.add(firstEv[0]['species']['name']);
+              evs.add({
+                'name': firstEv[0]['species']['name'],
+                'level': firstEv[0]['evolution_details'][0]['min_level']
+              });
               final secondEv = firstEv[0]['evolves_to'] as List<dynamic>;
               if (secondEv.isNotEmpty) {
-                evs.add(secondEv[0]['species']['name']);
+                evs.add({
+                  'name': secondEv[0]['species']['name'],
+                  'level': secondEv[0]['evolution_details'][0]['min_level']
+                });
               }
             }
             return evs;
           });
         });
-        final populatedEvs = await Future.wait<Pokemon>(
+        final populatedEvs = await Future.wait<Evolution>(
           evs.map((e) {
-            if (e == json['name']) {
-              return Future.value(Pokemon.fromJson(json));
+            if (e['name'] == json['name']) {
+              return Future.value(Evolution.fromJson(json: json, level: e['level'] as int?));
             }
             return dio.get(
-              'https://pokeapi.co/api/v2/pokemon/$e'
-            ).then((value) => Pokemon.fromJson(value.data as Map<String, dynamic>));
+              'https://pokeapi.co/api/v2/pokemon/${e['name']}'
+            ).then((value) {
+              return Evolution.fromJson(
+                json: value.data as Map<String, dynamic>,
+                level: e['level'] as int?
+              );
+            });
           })
         );
         return Pokemon.fromJson(json, evs: populatedEvs);
@@ -144,7 +174,7 @@ class _PokemonPageState extends State<PokemonPage> {
                       // evolutions
                       if (pokemon.evs.isNotEmpty) ...[
                         const SizedBox(height: 20),
-                        Text(t('Evolutions'), style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                        const Text('Evoluciones', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                         const SizedBox(height: 10),
                         Wrap(
                           spacing: 10,
@@ -169,7 +199,11 @@ class _PokemonPageState extends State<PokemonPage> {
                                         fit: BoxFit.cover,
                                       ),
                                     ),
-                                    Text(ev.name.capitalize(), style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+                                    Text(
+                                      ev.name.capitalize(), 
+                                      style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)
+                                    ),
+                                    if (ev.level != null) Text('Nivel ${ev.level}', style: const TextStyle(fontSize: 12)),
                                   ],
                                 ),
                               );
