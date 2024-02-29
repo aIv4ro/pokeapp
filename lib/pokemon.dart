@@ -8,15 +8,16 @@ class Pokemon {
   final String name;
   final String image;
   final List<String> types;
+  final List<Pokemon> evs;
 
-  Pokemon({required this.id, required this.name, required this.image, required this.types});
+  Pokemon({required this.id, required this.name, required this.image, required this.types, this.evs = const []});
 
-  static fromJson (Map<String, dynamic> json) {
+  static fromJson (Map<String, dynamic> json, {List<Pokemon> evs = const []}) {
     final id = json['id'] as int;
     final name = json['name'] as String;
     final image = json['sprites']['other']['official-artwork']['front_default'] as String;
     final types = (json['types'] as List<dynamic>).map((e) => e['type']['name'] as String).toList();
-    return Pokemon(id: id, name: name, image: image, types: types);
+    return Pokemon(id: id, name: name, image: image, types: types, evs: evs);
   }
 
 }
@@ -38,10 +39,41 @@ class _PokemonPageState extends State<PokemonPage> {
     super.initState();
     _pokemon = dio
       .get(widget.url)
-      .then((value) {
+      .then((value) async {
         final json = value.data as Map<String, dynamic>;
-        
-        return Pokemon.fromJson(json);
+        final evs = await dio.get(
+          json['species']['url'] as String
+        ).then((value) {
+          final json = value.data as Map<String, dynamic>;
+          return dio.get(
+            json['evolution_chain']['url']
+          ).then((value) {
+            final json = value.data as Map<String, dynamic>;
+            final chain = json['chain'] as Map<String, dynamic>;
+            final List<String> evs = [];
+            evs.add(chain['species']['name']);
+            final firstEv = chain['evolves_to'] as List<dynamic>;
+            if (firstEv.isNotEmpty) {
+              evs.add(firstEv[0]['species']['name']);
+              final secondEv = firstEv[0]['evolves_to'] as List<dynamic>;
+              if (secondEv.isNotEmpty) {
+                evs.add(secondEv[0]['species']['name']);
+              }
+            }
+            return evs;
+          });
+        });
+        final populatedEvs = await Future.wait<Pokemon>(
+          evs.map((e) {
+            if (e == json['name']) {
+              return Future.value(Pokemon.fromJson(json));
+            }
+            return dio.get(
+              'https://pokeapi.co/api/v2/pokemon/$e'
+            ).then((value) => Pokemon.fromJson(value.data as Map<String, dynamic>));
+          })
+        );
+        return Pokemon.fromJson(json, evs: populatedEvs);
       });
   }
 
@@ -108,7 +140,43 @@ class _PokemonPageState extends State<PokemonPage> {
                             }
                           ).toList(),
                         ),
-                      )
+                      ),
+                      // evolutions
+                      if (pokemon.evs.isNotEmpty) ...[
+                        const SizedBox(height: 20),
+                        Text(t('Evolutions'), style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                        const SizedBox(height: 10),
+                        Wrap(
+                          spacing: 10,
+                          children: pokemon.evs.map(
+                            (ev) {
+                              return InkWell(
+                                onTap: ev.name.toLowerCase() == pokemon.name.toLowerCase() ? null : () {
+                                  Navigator.pushNamed(context, '/pokemon', arguments: 'https://pokeapi.co/api/v2/pokemon/${ev.name}');
+                                },
+                                child: Column(
+                                  children: [
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        border: Border.all(color: Colors.transparent, width: 2),
+                                        borderRadius: BorderRadius.circular(10),
+                                        color: Colors.grey[200],
+                                      ),
+                                      child: Image.network(
+                                        ev.image,
+                                        width: MediaQuery.of(context).size.width * .2,
+                                        height: MediaQuery.of(context).size.width * .2,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                    Text(ev.name.capitalize(), style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+                                  ],
+                                ),
+                              );
+                            }
+                          ).toList(),
+                        ),
+                      ]
                     ],
                   )
                 ],
