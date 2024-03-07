@@ -76,7 +76,7 @@ export function Pokedex () {
                       component={Link}
                       href={`/pokedex/${id}`}
                     >
-                      <ListItemText primary={`${id}. ${pokemon.name}`} />
+                      <ListItemText className='capitalize' primary={`${id}. ${pokemon.name}`} />
                     </ListItemButton>
                   </ListItem>
                 )

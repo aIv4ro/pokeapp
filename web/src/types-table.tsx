@@ -1,9 +1,10 @@
-import { useEffect, useMemo, useState } from 'react'
+import { type ReactNode, useEffect, useMemo, useState } from 'react'
 import { Visibility, VisibilityOff } from '@mui/icons-material'
 import { mainApi } from './api'
 import { type Type } from 'pokenode-ts'
 import { Button, Chip, Stack, TextField } from '@mui/material'
 import { TypeChip, typeColor } from './type-chip'
+import { useTranslation } from './i18n'
 
 interface TypesState {
   loading: boolean
@@ -20,6 +21,8 @@ interface FiltersState {
 }
 
 export function TypesTable () {
+  const t = useTranslation()
+  const translationTypes = t().types as Record<string, string>
   const [typesState, setTypesState] = useState<TypesState>({
     loading: true
   })
@@ -38,7 +41,7 @@ export function TypesTable () {
     }
     const { search, doubleDamage, halfDamage, noDamage } = filters
     return types.filter(type => {
-      const matchSearch = search == null || search === '' || type.name.includes(search.toLocaleLowerCase())
+      const matchSearch = search == null || search === '' || translationTypes[type.name].includes(search.toLocaleLowerCase())
       const matchDoubleDamage = doubleDamage.length === 0 || doubleDamage.some(name => type.damage_relations.double_damage_to.some(type => type.name.toLocaleLowerCase() === name))
       const matchHalfDamage = halfDamage.length === 0 || halfDamage.some(name => type.damage_relations.half_damage_to.some(type => type.name === name))
       const matchNoDamage = noDamage.length === 0 || noDamage.some(name => type.damage_relations.no_damage_to.some(type => type.name === name))
@@ -111,117 +114,32 @@ export function TypesTable () {
                   }}
                 />
 
-                <div>
-                  x2
-                  <Stack direction='row' useFlexGap spacing={0.5} flexWrap={'wrap'}>
-                    {types.map(type => {
-                      const selected = filters.doubleDamage.includes(type.name)
-                      const colors = typeColor[type.name]
+                <TypeListFilter
+                  multiplier='2x'
+                  types={types}
+                  selectedTypes={filters.doubleDamage}
+                  onChange={(newList) => {
+                    setFilters({ ...filters, doubleDamage: newList })
+                  }}
+                />
 
-                      return (
-                        <Chip
-                          key={type.id}
-                          label={type.name}
-                          variant={selected ? 'filled' : 'outlined'}
-                          sx={{
-                            backgroundColor: selected ? colors.backgroundColor : 'transparent',
-                            color: selected ? colors.color : 'canvastext',
-                            borderColor: colors.backgroundColor
-                          }}
-                          onClick={() => {
-                            if (selected) {
-                              setFilters(prev => {
-                                return {
-                                  ...prev,
-                                  doubleDamage: prev.doubleDamage.filter(name => name !== type.name)
-                                }
-                              })
-                              return
-                            }
-                            setFilters({
-                              ...filters,
-                              doubleDamage: Array.from(new Set([...filters.doubleDamage, type.name]))
-                            })
-                          }}
-                        />
-                      )
-                    })}
-                  </Stack>
-                </div>
-                <div>
-                  x1/2
-                  <Stack direction='row' useFlexGap spacing={0.5} flexWrap={'wrap'}>
-                    {types.map(type => {
-                      const selected = filters.halfDamage.includes(type.name)
-                      const colors = typeColor[type.name]
+                <TypeListFilter
+                  multiplier='1/2x'
+                  types={types}
+                  selectedTypes={filters.halfDamage}
+                  onChange={(newList) => {
+                    setFilters({ ...filters, halfDamage: newList })
+                  }}
+                />
 
-                      return (
-                        <Chip
-                          key={type.id}
-                          label={type.name}
-                          variant={selected ? 'filled' : 'outlined'}
-                          sx={{
-                            backgroundColor: selected ? colors.backgroundColor : 'transparent',
-                            color: selected ? colors.color : 'canvastext',
-                            borderColor: colors.backgroundColor
-                          }}
-                          onClick={() => {
-                            if (selected) {
-                              setFilters(prev => {
-                                return {
-                                  ...prev,
-                                  halfDamage: prev.halfDamage.filter(name => name !== type.name)
-                                }
-                              })
-                              return
-                            }
-                            setFilters({
-                              ...filters,
-                              halfDamage: Array.from(new Set([...filters.halfDamage, type.name]))
-                            })
-                          }}
-                        />
-                      )
-                    })}
-                  </Stack>
-                </div>
-                <div>
-                  x0
-                  <Stack direction='row' useFlexGap spacing={0.5} flexWrap={'wrap'}>
-                    {types.map(type => {
-                      const selected = filters.noDamage.includes(type.name)
-                      const colors = typeColor[type.name]
-
-                      return (
-                        <Chip
-                          key={type.id}
-                          label={type.name}
-                          variant={selected ? 'filled' : 'outlined'}
-                          sx={{
-                            backgroundColor: selected ? colors.backgroundColor : 'transparent',
-                            color: selected ? colors.color : 'canvastext',
-                            borderColor: colors.backgroundColor
-                          }}
-                          onClick={() => {
-                            if (selected) {
-                              setFilters(prev => {
-                                return {
-                                  ...prev,
-                                  noDamage: prev.noDamage.filter(name => name !== type.name)
-                                }
-                              })
-                              return
-                            }
-                            setFilters({
-                              ...filters,
-                              noDamage: Array.from(new Set([...filters.noDamage, type.name]))
-                            })
-                          }}
-                        />
-                      )
-                    })}
-                  </Stack>
-                </div>
+                <TypeListFilter
+                  multiplier='0x'
+                  types={types}
+                  selectedTypes={filters.noDamage}
+                  onChange={(newList) => {
+                    setFilters({ ...filters, noDamage: newList })
+                  }}
+                />
               </div>
             )}
 
@@ -265,5 +183,53 @@ export function TypesTable () {
         )}
       </main>
     </>
+  )
+}
+
+export function TypeListFilter ({
+  multiplier,
+  types,
+  selectedTypes,
+  onChange
+}: {
+  multiplier: ReactNode
+  types: Type[]
+  selectedTypes: string[]
+  onChange: (newList: string[]) => void
+}) {
+  const t = useTranslation()
+  const translationTypes = t().types as Record<string, string>
+
+  return (
+    <div>
+      {multiplier}
+      <Stack direction='row' useFlexGap spacing={0.5} flexWrap={'wrap'}>
+        {types.map(type => {
+          const selected = selectedTypes.includes(type.name)
+          const colors = typeColor[type.name]
+
+          return (
+            <Chip
+              key={type.id}
+              label={translationTypes[type.name]}
+              variant={selected ? 'filled' : 'outlined'}
+              className='capitalize'
+              sx={{
+                backgroundColor: selected ? colors.backgroundColor : 'transparent',
+                color: selected ? colors.color : 'canvastext',
+                borderColor: colors.backgroundColor
+              }}
+              onClick={() => {
+                if (selected) {
+                  onChange(selectedTypes.filter(name => name !== type.name))
+                  return
+                }
+                onChange(Array.from(new Set([...selectedTypes, type.name])))
+              }}
+            />
+          )
+        })}
+      </Stack>
+    </div>
   )
 }
