@@ -29,6 +29,11 @@ module.exports = {
   ],
   rules: {
     '@typescript-eslint/explicit-function-return-type': 0,
-    'react/react-in-jsx-scope': 0
+    'react/react-in-jsx-scope': 0,
+    'jsx-quotes': [
+      'error',
+      'prefer-single'
+    ],
+    '@typescript-eslint/naming-convention': 0
   }
 }
