@@ -1,8 +1,10 @@
 import { AppBar, BottomNavigation, BottomNavigationAction, Typography } from '@mui/material'
 import { Link, Redirect, Route, Switch } from 'wouter'
-import { TypesTable } from './pages/types-table'
-import { Pokedex } from './pages/pokedex'
-import { Pokemon } from './pages/pokemon'
+import { lazy } from 'react'
+
+const LazyTypesTable = lazy(async () => await import('./pages/types-table'))
+const LazyPokedex = lazy(async () => await import('./pages/pokedex'))
+const LazyPokemon = lazy(async () => await import('./pages/pokemon'))
 
 function App () {
   return (
@@ -23,15 +25,15 @@ function App () {
       <Switch>
         <Route
           path='/types-table?'
-          component={TypesTable}
+          component={LazyTypesTable}
         />
         <Route
           path='/pokedex'
-          component={Pokedex}
+          component={LazyPokedex}
         />
         <Route
           path='/pokedex/:id'
-          component={Pokemon}
+          component={LazyPokemon}
         />
         <Route
           component={() => <Redirect to='/pokedex' />}

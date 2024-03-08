@@ -10,7 +10,7 @@ interface PokedexState {
   pokedex?: NamedAPIResource[]
 }
 
-export function Pokedex () {
+export default function Pokedex () {
   const [pokedexState, setPokedexState] = useState<PokedexState>({
     loading: true
   })

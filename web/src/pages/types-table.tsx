@@ -6,7 +6,7 @@ import { TypesTableHeader } from '../components/types-table-header'
 import { TypesTableFilters } from '../components/types-table-filters'
 import { TypesTableChart } from '../components/types-table-chart'
 
-export function TypesTable () {
+export default function TypesTable () {
   const { types: translationTypes }: { types: Record<string, string> } = useTranslation()
   const { filters, showFilters, toggleShowFilters, navigate } = useTypesTableFilters()
   const { loading, error, types } = useTypes()

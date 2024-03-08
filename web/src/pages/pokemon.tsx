@@ -28,7 +28,7 @@ interface PokemonState {
   pokemon?: PokemonWithEvolution
 }
 
-export function Pokemon () {
+export default function Pokemon () {
   const { id } = useParams<{ id: string }>()
   const [pokemonState, setPokemonState] = useState<PokemonState>({
     loading: true
