@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { mainApi } from './api'
+import { mainApi } from '../api'
 import { type NamedAPIResource } from 'pokenode-ts'
 import { Link } from 'wouter'
 import { ListItem, ListItemButton, ListItemText, Stack, TextField } from '@mui/material'

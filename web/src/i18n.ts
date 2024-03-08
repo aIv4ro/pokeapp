@@ -22,7 +22,5 @@ const es = {
 } as const
 
 export function useTranslation () {
-  return () => {
-    return es
-  }
+  return es
 }

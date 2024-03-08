@@ -1,8 +1,8 @@
 import { AppBar, BottomNavigation, BottomNavigationAction, Typography } from '@mui/material'
 import { Link, Redirect, Route, Switch } from 'wouter'
-import { TypesTable } from './types-table'
-import { Pokedex } from './pokedex'
-import { Pokemon } from './pokemon'
+import { TypesTable } from './pages/types-table'
+import { Pokedex } from './pages/pokedex'
+import { Pokemon } from './pages/pokemon'
 
 function App () {
   return (

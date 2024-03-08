@@ -1,5 +1,5 @@
 import { Chip } from '@mui/material'
-import { useTranslation } from './i18n'
+import { useTranslation } from '../i18n'
 
 export const typeColor: Record<string, { backgroundColor: string, color: string }> = {
   normal: { backgroundColor: '#A8A878', color: 'black' },
@@ -23,9 +23,8 @@ export const typeColor: Record<string, { backgroundColor: string, color: string 
 }
 
 export function TypeChip ({ type }: { type: string }) {
-  const t = useTranslation()
+  const { types }: { types: Record<string, string> } = useTranslation()
   const { backgroundColor, color } = typeColor[type]
-  const types = t().types as Record<string, string>
 
   return (
     <Chip
