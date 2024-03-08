@@ -1,6 +1,6 @@
 import { AppBar, BottomNavigation, BottomNavigationAction, Typography } from '@mui/material'
 import { Link, Redirect, Route, Switch } from 'wouter'
-import { lazy } from 'react'
+import { Suspense, lazy } from 'react'
 
 const LazyTypesTable = lazy(async () => await import('./pages/types-table'))
 const LazyPokedex = lazy(async () => await import('./pages/pokedex'))
@@ -22,23 +22,25 @@ function App () {
         </Typography>
       </AppBar>
 
-      <Switch>
-        <Route
-          path='/types-table?'
-          component={LazyTypesTable}
-        />
-        <Route
-          path='/pokedex'
-          component={LazyPokedex}
-        />
-        <Route
-          path='/pokedex/:id'
-          component={LazyPokemon}
-        />
-        <Route
-          component={() => <Redirect to='/pokedex' />}
-        />
-      </Switch>
+      <Suspense fallback={<div className='flex-1' />}>
+        <Switch>
+          <Route
+            path='/types-table'
+            component={LazyTypesTable}
+          />
+          <Route
+            path='/pokedex'
+            component={LazyPokedex}
+          />
+          <Route
+            path='/pokedex/:id'
+            component={LazyPokemon}
+          />
+          <Route
+            component={() => <Redirect to='/pokedex' />}
+          />
+        </Switch>
+      </Suspense>
 
       <BottomNavigation
         showLabels
