@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import { mainApi } from '../api'
 import { type NamedAPIResource } from 'pokenode-ts'
-import { Link } from 'wouter'
-import { ListItem, ListItemButton, ListItemText, Stack, TextField } from '@mui/material'
+import { PokedexList } from '../components/pokdex-list'
+import { TextField } from '@mui/material'
 
 interface PokedexState {
   loading: boolean
@@ -45,7 +45,7 @@ export function Pokedex () {
   }, [pokedexState.pokedex, search])
 
   return (
-    <main className='p-2 flex-1 flex flex-col overflow-y-auto'>
+    <main className='p-2 flex-1 flex flex-col overflow-y-auto gap-2'>
       <h1 className='text-2xl font-bold'>Pokedex</h1>
       {pokedexState.loading && <p>Loading ...</p>}
       {pokedexState.error != null && <p>Error: {pokedexState.error}</p>}
@@ -61,28 +61,7 @@ export function Pokedex () {
               setSearch(value)
             }}
           />
-          <Stack spacing={0.5} className='mt-4'>
-            {
-              filteredPokedex.map(pokemon => {
-                const id = pokemon.url.split('/').slice(-2, -1)[0]
-
-                return (
-                  <ListItem
-                    key={pokemon.name}
-                    disablePadding
-                    className='shadow'
-                  >
-                    <ListItemButton
-                      component={Link}
-                      href={`/pokedex/${id}`}
-                    >
-                      <ListItemText className='capitalize' primary={`${id}. ${pokemon.name}`} />
-                    </ListItemButton>
-                  </ListItem>
-                )
-              })
-            }
-          </Stack>
+          <PokedexList pokedex={filteredPokedex} />
         </>
       )}
     </main>
