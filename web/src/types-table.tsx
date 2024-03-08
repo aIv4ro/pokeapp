@@ -5,6 +5,7 @@ import { type Type } from 'pokenode-ts'
 import { Button, Chip, Stack, TextField } from '@mui/material'
 import { TypeChip, typeColor } from './type-chip'
 import { useTranslation } from './i18n'
+import { useLocation, useSearch } from 'wouter'
 
 interface TypesState {
   loading: boolean
@@ -17,22 +18,36 @@ interface FiltersState {
   doubleDamage: string[]
   halfDamage: string[]
   noDamage: string[]
-  showFilters: boolean
 }
 
 export function TypesTable () {
   const t = useTranslation()
   const translationTypes = t().types as Record<string, string>
+
+  const [, setLocation] = useLocation()
+  const query = useSearch()
+
   const [typesState, setTypesState] = useState<TypesState>({
     loading: true
   })
-  const [filters, setFilters] = useState<FiltersState>({
-    showFilters: false,
-    search: '',
-    doubleDamage: [],
-    halfDamage: [],
-    noDamage: []
-  })
+
+  const [showFilters, setShowFilters] = useState(false)
+
+  const filters = useMemo<FiltersState>(() => {
+    const params = new URLSearchParams(query)
+    const x2 = params.getAll('x2') ?? []
+    const x1_2 = params.getAll('x1_2') ?? []
+    const x0 = params.getAll('x0') ?? []
+    const search = params.get('search') ?? ''
+    return {
+      search,
+      doubleDamage: x2,
+      halfDamage: x1_2,
+      noDamage: x0
+    }
+  }, [query])
+
+  console.log('types table render')
 
   const filteredTypes = useMemo(() => {
     const { types } = typesState
@@ -75,6 +90,16 @@ export function TypesTable () {
       })
   }, [])
 
+  function navigate (newFilters: FiltersState) {
+    const searchParams = new URLSearchParams()
+    const { search, doubleDamage, halfDamage, noDamage } = newFilters
+    searchParams.set('search', search ?? '')
+    doubleDamage.forEach(name => { searchParams.append('x2', name) })
+    halfDamage.forEach(name => { searchParams.append('x1_2', name) })
+    noDamage.forEach(name => { searchParams.append('x0', name) })
+    setLocation(`/types-table?${searchParams.toString()}`)
+  }
+
   const { loading, error, types } = typesState
 
   return (
@@ -88,21 +113,16 @@ export function TypesTable () {
               <h1 className='text-2xl font-bold'>Tipos</h1>
               <Button
                 onClick={() => {
-                  setFilters(prev => {
-                    return {
-                      ...prev,
-                      showFilters: !prev.showFilters
-                    }
-                  })
+                  setShowFilters(!showFilters)
                 }}
-                startIcon={filters.showFilters ? <VisibilityOff /> : <Visibility />}
+                startIcon={showFilters ? <VisibilityOff /> : <Visibility />}
                 variant='contained'
               >
-                {filters.showFilters ? 'Ocultar filtros' : 'Mostrar filtros'}
+                {showFilters ? 'Ocultar filtros' : 'Mostrar filtros'}
               </Button>
             </header>
 
-            {filters.showFilters && (
+            {showFilters && (
               <div className='my-4'>
                 <TextField
                   variant='filled'
@@ -110,34 +130,34 @@ export function TypesTable () {
                   value={filters.search}
                   className='w-full'
                   onChange={e => {
-                    setFilters({ ...filters, search: e.target.value })
+                    navigate({ ...filters, search: e.target.value })
                   }}
                 />
 
                 <TypeListFilter
-                  multiplier='2x'
+                  multiplier='x2'
                   types={types}
                   selectedTypes={filters.doubleDamage}
                   onChange={(newList) => {
-                    setFilters({ ...filters, doubleDamage: newList })
+                    navigate({ ...filters, doubleDamage: newList })
                   }}
                 />
 
                 <TypeListFilter
-                  multiplier='1/2x'
+                  multiplier='x1/2'
                   types={types}
                   selectedTypes={filters.halfDamage}
                   onChange={(newList) => {
-                    setFilters({ ...filters, halfDamage: newList })
+                    navigate({ ...filters, halfDamage: newList })
                   }}
                 />
 
                 <TypeListFilter
-                  multiplier='0x'
+                  multiplier='x0'
                   types={types}
                   selectedTypes={filters.noDamage}
                   onChange={(newList) => {
-                    setFilters({ ...filters, noDamage: newList })
+                    navigate({ ...filters, noDamage: newList })
                   }}
                 />
               </div>

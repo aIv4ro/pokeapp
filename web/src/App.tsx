@@ -22,7 +22,7 @@ function App () {
 
       <Switch>
         <Route
-          path='/types-table'
+          path='/types-table?'
           component={TypesTable}
         />
         <Route

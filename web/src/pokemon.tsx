@@ -61,13 +61,7 @@ export function Pokemon () {
           />
           <h1 className='text-2xl font-bold uppercase'>{pokemon.name}</h1>
           <h3 className='text-xl font-bold my-2'>Tipos</h3>
-          <ul className='flex gap-1'>
-            {pokemon.types.map(({ type }) => (
-              <li key={type.name}>
-                <TypeChip type={type.name} />
-              </li>
-            ))}
-          </ul>
+          <PokemonTypes types={pokemon.types} />
           <h3 className='text-xl font-bold my-2'>
             Evoluciones
           </h3>
@@ -75,6 +69,28 @@ export function Pokemon () {
         </>
       )}
     </main>
+  )
+}
+
+function PokemonTypes ({ types }: { types: PokemonWithEvolution['types'] }) {
+  const searchParams = new URLSearchParams()
+  types.forEach(({ type }) => {
+    searchParams.append('x2', type.name)
+  })
+
+  return (
+    <Link
+      href={`/types-table?${searchParams.toString()}`}
+      className='p-2 hover:bg-slate-100 transition-colors rounded'
+    >
+      <ul className='flex gap-1'>
+        {types.map(({ type }) => (
+          <li key={type.name}>
+            <TypeChip type={type.name} />
+          </li>
+        ))}
+      </ul>
+    </Link>
   )
 }
 
