@@ -20,7 +20,7 @@ export function TypeListFilter ({
   return (
     <div>
       {multiplier}
-      <Stack direction='row' useFlexGap spacing={0.5} flexWrap={'wrap'}>
+      <Stack direction='row' useFlexGap spacing={0.5} overflow='auto'>
         {types.map(type => {
           const selected = selectedTypes.has(type.name)
           const colors = typeColor[type.name]
