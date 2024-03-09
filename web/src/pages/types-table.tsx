@@ -18,10 +18,14 @@ export default function TypesTable () {
     const { search, doubleDamage, halfDamage, noDamage } = filters
     return types.filter(type => {
       const matchSearch = search == null || search === '' || translationTypes[type.name].includes(search.toLocaleLowerCase())
-      const matchDoubleDamage = doubleDamage.length === 0 || doubleDamage.some(name => type.damage_relations.double_damage_to.some(type => type.name.toLocaleLowerCase() === name))
-      const matchHalfDamage = halfDamage.length === 0 || halfDamage.some(name => type.damage_relations.half_damage_to.some(type => type.name === name))
-      const matchNoDamage = noDamage.length === 0 || noDamage.some(name => type.damage_relations.no_damage_to.some(type => type.name === name))
-      return matchSearch && matchDoubleDamage && matchHalfDamage && matchNoDamage
+      const matchDoubleDamage = doubleDamage.size === 0 || type.damage_relations.double_damage_to.some(type => doubleDamage.has(type.name))
+      const matchHalfDamage = halfDamage.size === 0 || type.damage_relations.half_damage_to.some(type => halfDamage.has(type.name))
+      const matchNoDamage = noDamage.size === 0 || type.damage_relations.no_damage_to.some(type => noDamage.has(type.name))
+
+      return matchSearch &&
+        matchDoubleDamage &&
+        matchHalfDamage &&
+        matchNoDamage
     })
   }, [types, filters])
 

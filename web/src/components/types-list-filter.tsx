@@ -12,8 +12,8 @@ export function TypeListFilter ({
 }: {
   multiplier: ReactNode
   types: Type[]
-  selectedTypes: string[]
-  onChange: (newList: string[]) => void
+  selectedTypes: Set<string>
+  onChange: (newList: Set<string>) => void
 }) {
   const { types: translationTypes }: { types: Record<string, string> } = useTranslation()
 
@@ -22,7 +22,7 @@ export function TypeListFilter ({
       {multiplier}
       <Stack direction='row' useFlexGap spacing={0.5} flexWrap={'wrap'}>
         {types.map(type => {
-          const selected = selectedTypes.includes(type.name)
+          const selected = selectedTypes.has(type.name)
           const colors = typeColor[type.name]
 
           return (
@@ -38,10 +38,12 @@ export function TypeListFilter ({
               }}
               onClick={() => {
                 if (selected) {
-                  onChange(selectedTypes.filter(name => name !== type.name))
+                  const copy = new Set(selectedTypes)
+                  copy.delete(type.name)
+                  onChange(copy)
                   return
                 }
-                onChange(Array.from(new Set([...selectedTypes, type.name])))
+                onChange(new Set([...selectedTypes, type.name]))
               }}
             />
           )

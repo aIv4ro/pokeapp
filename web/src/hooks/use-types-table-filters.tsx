@@ -3,9 +3,9 @@ import { useLocation, useSearch } from 'wouter'
 
 export interface FiltersState {
   search?: string
-  doubleDamage: string[]
-  halfDamage: string[]
-  noDamage: string[]
+  doubleDamage: Set<string>
+  halfDamage: Set<string>
+  noDamage: Set<string>
 }
 
 export function useTypesTableFilters () {
@@ -15,9 +15,9 @@ export function useTypesTableFilters () {
 
   const filters = useMemo<FiltersState>(() => {
     const params = new URLSearchParams(query)
-    const x2 = params.getAll('x2') ?? []
-    const x1_2 = params.getAll('x1_2') ?? []
-    const x0 = params.getAll('x0') ?? []
+    const x2 = new Set(params.getAll('x2')) ?? []
+    const x1_2 = new Set(params.getAll('x1_2')) ?? []
+    const x0 = new Set(params.getAll('x0')) ?? []
     const search = params.get('search') ?? ''
     return {
       search,
@@ -31,9 +31,9 @@ export function useTypesTableFilters () {
     const searchParams = new URLSearchParams()
     const { search, doubleDamage, halfDamage, noDamage } = newFilters
     searchParams.set('search', search ?? '')
-    doubleDamage.forEach(name => { searchParams.append('x2', name) })
-    halfDamage.forEach(name => { searchParams.append('x1_2', name) })
-    noDamage.forEach(name => { searchParams.append('x0', name) })
+    doubleDamage.forEach(searchParams.append.bind(searchParams, 'x2'))
+    halfDamage.forEach(searchParams.append.bind(searchParams, 'x1_2'))
+    noDamage.forEach(searchParams.append.bind(searchParams, 'x0'))
     setLocation(`/types-table?${searchParams.toString()}`)
   }, [setLocation])
 
