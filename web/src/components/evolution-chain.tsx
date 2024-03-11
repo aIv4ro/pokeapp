@@ -15,7 +15,7 @@ export function EvolutionChain ({
 
   return (
     <ul className='flex gap-2'>
-      <li>
+      <li className='max-w-28'>
         <Link
           href={`/pokedex/${id}`}
           className={`flex flex-col text-center transition-all hover:scale-105 rounded hover:bg-slate-100 p-2 ${urlId === id ? 'pointer-events-none' : ''}`}
