@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useState } from "react"
-import { mainApi } from "../api"
-import { NamedAPIResource } from "pokenode-ts"
+import { useEffect, useMemo, useState } from 'react'
+import { mainApi } from '../api'
+import { type NamedAPIResource } from 'pokenode-ts'
+import { useLocation, useSearch } from 'wouter'
 
 interface PokedexState {
   loading: boolean
@@ -9,10 +10,12 @@ interface PokedexState {
 }
 
 export function usePokedex () {
+  const query = useSearch()
+  const [, setLocation] = useLocation()
+
   const [pokedexState, setPokedexState] = useState<PokedexState>({
     loading: true
   })
-  const [search, setSearch] = useState('')
 
   useEffect(() => {
     mainApi.pokemon
@@ -32,6 +35,11 @@ export function usePokedex () {
       })
   }, [])
 
+  const search = useMemo(() => {
+    const searchParams = new URLSearchParams(query)
+    return searchParams.get('search') ?? ''
+  }, [query])
+
   const filteredPokedex = useMemo(() => {
     if (pokedexState.pokedex == null) {
       return null
@@ -42,10 +50,14 @@ export function usePokedex () {
     })
   }, [pokedexState.pokedex, search])
 
+  function onSearchChange (value: string) {
+    setLocation(`/pokedex?search=${value}`)
+  }
+
   return {
     filteredPokedex,
     pokedexState,
     search,
-    setSearch,
+    onSearchChange
   }
 }

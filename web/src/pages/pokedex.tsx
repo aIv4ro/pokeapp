@@ -3,7 +3,7 @@ import { TextField } from '@mui/material'
 import { usePokedex } from '../hooks/use-pokedex'
 
 export default function Pokedex () {
-  const { filteredPokedex, pokedexState, search, setSearch } = usePokedex()
+  const { filteredPokedex, pokedexState, search, onSearchChange } = usePokedex()
 
   return (
     <main className='p-2 flex-1 flex flex-col overflow-y-auto gap-2'>
@@ -16,10 +16,10 @@ export default function Pokedex () {
             variant='filled'
             label='Buscar Pokemon'
             className='w-full'
-            value={search}
+            defaultValue={search}
             onChange={e => {
               const { value } = e.target
-              setSearch(value)
+              onSearchChange(value)
             }}
           />
           <PokedexList pokedex={filteredPokedex} />
