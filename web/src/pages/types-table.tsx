@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { useTranslation } from '../i18n'
+import { useTranslation, PokemonType } from '../i18n'
 import { useTypesTableFilters } from '../hooks/use-types-table-filters'
 import { useTypes } from '../hooks/use-types'
 import { TypesTableHeader } from '../components/types-table-header'
@@ -7,7 +7,7 @@ import { TypesTableFilters } from '../components/types-table-filters'
 import { TypesTableChart } from '../components/types-table-chart'
 
 export default function TypesTable () {
-  const { types: translationTypes }: { types: Record<string, string> } = useTranslation()
+  const { tType } = useTranslation()
   const { filters, showFilters, toggleShowFilters, navigate } = useTypesTableFilters()
   const { loading, error, types } = useTypes()
 
@@ -17,7 +17,7 @@ export default function TypesTable () {
     }
     const { search, doubleDamage, halfDamage, noDamage } = filters
     return types.filter(type => {
-      const matchSearch = search == null || search === '' || translationTypes[type.name].includes(search.toLocaleLowerCase())
+      const matchSearch = search == null || search === '' || tType(type.name as PokemonType).includes(search.toLocaleLowerCase())
       const matchDoubleDamage = doubleDamage.size === 0 || type.damage_relations.double_damage_to.some(type => doubleDamage.has(type.name))
       const matchHalfDamage = halfDamage.size === 0 || type.damage_relations.half_damage_to.some(type => halfDamage.has(type.name))
       const matchNoDamage = noDamage.size === 0 || type.damage_relations.no_damage_to.some(type => noDamage.has(type.name))

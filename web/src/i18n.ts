@@ -1,26 +1,39 @@
+export type PokemonType = 'normal' | 'fire' | 'water' | 'electric' | 'grass' | 'ice' | 'fighting' | 'poison' | 'ground' | 'flying' | 'psychic' | 'bug' | 'rock' | 'ghost' | 'dragon' | 'dark' | 'steel' | 'fairy'
+// type PokemonTypeTranslation = `types.${PokemonType}`
+
 const es = {
-  types: {
-    normal: 'normal',
-    fire: 'fuego',
-    water: 'agua',
-    electric: 'eléctrico',
-    grass: 'planta',
-    ice: 'hielo',
-    fighting: 'lucha',
-    poison: 'veneno',
-    ground: 'tierra',
-    flying: 'volador',
-    psychic: 'psíquico',
-    bug: 'bicho',
-    rock: 'roca',
-    ghost: 'fantasma',
-    dragon: 'dragón',
-    dark: 'siniestro',
-    steel: 'acero',
-    fairy: 'hada'
-  }
+  'types.normal': 'normal',
+  'types.fire': 'fuego',
+  'types.water': 'agua',
+  'types.electric': 'eléctrico',
+  'types.grass': 'planta',
+  'types.ice': 'hielo',
+  'types.fighting': 'lucha',
+  'types.poison': 'veneno',
+  'types.ground': 'tierra',
+  'types.flying': 'volador',
+  'types.psychic': 'psíquico',
+  'types.bug': 'bicho',
+  'types.rock': 'roca',
+  'types.ghost': 'fantasma',
+  'types.dragon': 'dragón',
+  'types.dark': 'siniestro',
+  'types.steel': 'acero',
+  'types.fairy': 'hada'
 } as const
 
 export function useTranslation () {
-  return es
+  const dic = es
+
+  function t (key: keyof typeof es) {
+    return dic[key]
+  }
+
+  function tType (key: PokemonType) {
+    return dic[`types.${key}`]
+  }
+
+  return {
+    t, tType
+  }
 }

@@ -1,8 +1,8 @@
 import { Chip, Stack } from '@mui/material'
 import { type Type } from 'pokenode-ts'
 import { type ReactNode } from 'react'
-import { useTranslation } from '../i18n'
-import { typeColor } from './type-chip'
+import { PokemonType, useTranslation } from '../i18n'
+import { typeColor } from '../constants'
 
 export function TypeListFilter ({
   multiplier,
@@ -15,7 +15,7 @@ export function TypeListFilter ({
   selectedTypes: Set<string>
   onChange: (newList: Set<string>) => void
 }) {
-  const { types: translationTypes }: { types: Record<string, string> } = useTranslation()
+  const { tType } = useTranslation()
 
   return (
     <div>
@@ -28,7 +28,7 @@ export function TypeListFilter ({
           return (
             <Chip
               key={type.id}
-              label={translationTypes[type.name]}
+              label={tType(type.name as PokemonType)}
               variant={selected ? 'filled' : 'outlined'}
               className='capitalize'
               sx={{
