@@ -1,10 +1,11 @@
 import { useMemo } from 'react'
-import { useTranslation, PokemonType } from '../i18n'
+import { useTranslation, type PokemonType } from '../i18n'
 import { useTypesTableFilters } from '../hooks/use-types-table-filters'
 import { useTypes } from '../hooks/use-types'
 import { TypesTableHeader } from '../components/types-table-header'
 import { TypesTableFilters } from '../components/types-table-filters'
 import { TypesTableChart } from '../components/types-table-chart'
+import { Spinner } from '../components/spinner'
 
 export default function TypesTable () {
   const { tType } = useTranslation()
@@ -32,7 +33,7 @@ export default function TypesTable () {
   return (
     <>
       <main className='p-2 overflow-x-auto flex-1 flex-col'>
-        {loading && <p>Loading ...</p>}
+        {loading && <Spinner />}
         {error != null && <p>Error: {error}</p>}
         {types != null && (
           <>

@@ -1,0 +1,24 @@
+.spinner {
+  animation: pokeball-catch 1s infinite;
+}
+
+@keyframes pokeball-catch {
+  0% {
+    transform: rotate(0);
+  }
+  10% {
+    transform: rotate(-15deg);
+  }
+  20% {
+    transform: rotate(15deg);
+  }
+  30% {
+    transform: rotate(-15deg);
+  }
+  50% {
+    transform: rotate(0);
+  }
+  100% {
+    transform: rotate(0);
+  }
+}

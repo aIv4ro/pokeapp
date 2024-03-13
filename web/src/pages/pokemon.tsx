@@ -4,6 +4,7 @@ import { mainApi } from '../api'
 import { PokemonAvatar } from '../components/pokemon-avatar'
 import { PokemonTypes } from '../components/pokemon-types'
 import { EvolutionChain } from '../components/evolution-chain'
+import { Spinner } from '../components/spinner'
 
 async function getPokemonWithEvolution (id: number) {
   return await mainApi.pokemon
@@ -53,7 +54,7 @@ export default function Pokemon () {
 
   return (
     <main className='p-2 overflow-x-auto flex-1 flex flex-col items-center'>
-      {loading && <p>Loading ...</p>}
+      {loading && <Spinner />}
       {error != null && <p>Error: {error}</p>}
       {pokemon != null && (
         <>
