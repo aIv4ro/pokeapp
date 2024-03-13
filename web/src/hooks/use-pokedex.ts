@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { mainApi } from '../api'
 import { type NamedAPIResource } from 'pokenode-ts'
 import { useLocation, useSearch } from 'wouter'
+import { useDebounceCallback } from './use-debounce-callback'
 
 interface PokedexState {
   loading: boolean
@@ -50,9 +51,9 @@ export function usePokedex () {
     })
   }, [pokedexState.pokedex, search])
 
-  function onSearchChange (value: string) {
+  const onSearchChange = useDebounceCallback((value: string) => {
     setLocation(`/pokedex?search=${value}`)
-  }
+  }, 300, [])
 
   return {
     filteredPokedex,
