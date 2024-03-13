@@ -36,6 +36,9 @@ export default function Pokemon () {
   })
 
   useEffect(() => {
+    setPokemonState({
+      loading: true
+    })
     getPokemonWithEvolution(Number(id))
       .then(pokemon => {
         setPokemonState({
